@@ -10,6 +10,8 @@ import telegram
 
 from dotenv import load_dotenv
 
+from custom_exceptions import SendMessageError
+
 load_dotenv()
 
 EMPTY_REQUIRED_TOKENS = 'Отсутствует переменная окружения {token}.'
@@ -18,15 +20,15 @@ MESSAGE_SENT = 'Сообщение отправлено.'
 ENDPOINT_UNAVAILABLE = '{ENDPOINT} недоступен.'
 SERVER_UNAVAILABLE = 'Сервер недоступен. Код ответа '
 REQUEST_ERROR = 'Ошибка {request_error} при попытке запроса.'
-INVALID_API_RESPONSE_TYPE = 'Некорректный тип данных: ' \
-                            'ответ API должен иметь тип "dict".'
+INVALID_API_RESPONSE_TYPE = ('Некорректный тип данных: '
+                             'ответ API должен иметь тип "dict".')
 MISSING_HOMEWORKS_KEY = 'В полученном ответе отсутсвует ключ "homeworks".'
-INVALID_HOMEWORKS_TYPE = 'Некорректный тип данных: '\
-                         '"homeworks" должен иметь тип "list".'
+INVALID_HOMEWORKS_TYPE = ('Некорректный тип данных: '
+                          '"homeworks" должен иметь тип "list".')
 INVALID_HOMEWORK_STATUS = 'Некорректный статус домашней работы.'
 MISSING_HOMEWORK_NAME_KEY = 'Отсутствует ключ "homework_name".'
-CHECK_STATUS_CHANGED = 'Изменился статус проверки работы '\
-                       '"{homework_name}". {verdict}'
+CHECK_STATUS_CHANGED = ('Изменился статус проверки работы '
+                        '"{homework_name}". {verdict}')
 ERROR_REQUIRED_TOKENS = 'Ошибка в переменных окружения.'
 PROGRAM_STOPPED = 'Программа остановлена.'
 PROGRAM_FAILURE = 'Сбой в работе программы: {error}.'
@@ -51,9 +53,8 @@ HOMEWORK_VERDICTS = {
 def check_tokens():
     """Проверяет доступность переменных окружения."""
     required_tokens = ['PRACTICUM_TOKEN', 'TELEGRAM_TOKEN', 'TELEGRAM_CHAT_ID']
-    global_dict = globals()
     for token in required_tokens:
-        if token not in global_dict or global_dict[token] is None:
+        if token not in globals() or globals()[token] is None:
             logging.critical(EMPTY_REQUIRED_TOKENS.format(token=token))
             return False
     return True
@@ -65,7 +66,7 @@ def send_message(bot, message):
         bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
     except Exception:
         logging.error(ERROR_SENDING_MESSAGE)
-        raise Exception(ERROR_SENDING_MESSAGE)
+        raise SendMessageError(ERROR_SENDING_MESSAGE)
     else:
         logging.debug(MESSAGE_SENT)
 
@@ -111,8 +112,7 @@ def parse_status(homework):
         raise KeyError(INVALID_HOMEWORK_STATUS)
     if 'homework_name' not in homework:
         logging.error(MISSING_HOMEWORK_NAME_KEY)
-        raise KeyError(
-            MISSING_HOMEWORK_NAME_KEY)
+        raise KeyError(MISSING_HOMEWORK_NAME_KEY)
     verdict = HOMEWORK_VERDICTS[homework_status]
     return CHECK_STATUS_CHANGED.format(
         homework_name=homework_name, verdict=verdict)
