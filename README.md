@@ -36,8 +36,8 @@
 
 4. Создать файл .env в этой директории и укажите собственные токены:
   ```
-  PRACTICUM_TOKEN = токен Яндекс практикум.
-  TELEGRAM_TOKEN = токен вашего бота Telegram полученный от BotFather.
+  PRACTICUM_TOKEN = токен Яндекс.Практикум.
+  TELEGRAM_TOKEN = токен вашего бота Telegram.
   TELEGRAM_CHAT_ID = id вашего чата в Telegram.
   ```
 
